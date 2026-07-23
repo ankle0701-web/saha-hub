@@ -40,17 +40,18 @@ body{
 .crumbs .seg.current:hover{background:transparent;}
 .crumbs .sep{color:var(--ink-faint);}
 
-header.hub-header{margin-bottom:28px;}
+header.hub-header{margin-bottom:28px;text-align:center;}
 .eyebrow{font-size:12.5px;font-weight:700;color:var(--primary);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
 h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-0.02em;}
 .desc{margin:6px 0 0;font-size:14px;color:var(--ink-soft);}
 
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+.card-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+.card-grid .card{width:230px;flex:0 0 auto;}
 
 .card{
   background:var(--surface);border-radius:16px;box-shadow:var(--shadow);
   padding:24px 22px;cursor:pointer;transition:.16s;border:1px solid transparent;
-  display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;text-decoration:none;color:inherit;
 }
 .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--primary-soft);}
 .card .icon{font-size:30px;margin-bottom:4px;}
@@ -92,17 +93,45 @@ h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-0.02em;}
   z-index:0;
 }
 .hero-card .hero-eyebrow,.hero-card .hero-title,.hero-card .hero-sub,.hero-mark{position:relative;z-index:1;}
-.hero-card .hero-eyebrow{font-size:12.5px;font-weight:700;color:#C9DDE8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
-.hero-card .hero-title{font-size:26px;font-weight:700;color:#FFFFFF;letter-spacing:-0.02em;margin-bottom:6px;}
-.hero-card .hero-sub{font-size:13.5px;color:#B8CCD8;max-width:440px;line-height:1.6;}
+.hero-card .hero-eyebrow{font-size:12.5px;font-weight:700;color:#C9DDE8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;text-align:center;}
+.hero-card .hero-title{font-size:26px;font-weight:700;color:#FFFFFF;letter-spacing:-0.02em;margin-bottom:6px;text-align:center;}
+.hero-card .hero-sub{font-size:13.5px;color:#B8CCD8;max-width:600px;line-height:1.6;margin:0 auto;text-align:center;}
 .hero-mark{
-  position:absolute;top:0;right:0;bottom:0;width:180px;
-  display:flex;align-items:center;justify-content:center;opacity:0.9;
+  display:none;
 }
 .hero-mark svg{width:120px;height:120px;}
 @media (max-width:640px){
   .hero-mark{display:none;}
   .hero-card{padding:26px 22px;}
+}
+
+.quote-card{
+  background:var(--surface);border-radius:14px;box-shadow:var(--shadow);
+  padding:22px 26px;margin-bottom:16px;position:relative;
+  border-left:4px solid #E8C77E;
+}
+.quote-mark{
+  position:absolute;top:6px;left:14px;font-size:44px;font-weight:700;
+  color:#E8C77E;opacity:0.5;line-height:1;font-family:Georgia,serif;
+}
+.quote-text{
+  font-size:15px;font-weight:600;color:var(--ink);line-height:1.6;
+  padding-left:20px;
+}
+.quote-sub{
+  font-size:12px;color:var(--ink-faint);margin-top:8px;padding-left:20px;
+}
+
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px;}
+.stat-item{
+  background:var(--surface);border-radius:14px;box-shadow:var(--shadow);
+  padding:16px 18px;display:flex;align-items:center;gap:12px;
+}
+.stat-item .stat-icon{font-size:22px;}
+.stat-item .stat-label{font-size:11.5px;color:var(--ink-faint);font-weight:600;}
+.stat-item .stat-value{font-size:15px;font-weight:700;color:var(--ink);}
+@media (max-width:640px){
+  .stat-row{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -114,7 +143,7 @@ h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-0.02em;}
   <div class="hero-card" id="heroCard">
     <div class="hero-eyebrow">사회복지법인 다하</div>
     <div class="hero-title">사하의집 업무 허브</div>
-    <div class="hero-sub">기린초·물봉선 두 유닛의 투약·배변·생리·신체측정·수분섭취 기록을 한 곳에서 관리합니다.</div>
+    <div class="hero-sub">기린초·물봉선 두 유닛의 투약·배변·생리·신체측정 기록을 한 곳에서 관리합니다.</div>
     <div class="hero-mark">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="46" fill="none" stroke="#4C78FA" stroke-opacity="0.35" stroke-width="1"/>
@@ -125,6 +154,15 @@ h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-0.02em;}
       </svg>
     </div>
   </div>
+
+  <div class="quote-card" id="quoteCard">
+    <div class="quote-mark">“</div>
+    <div class="quote-text" id="quoteText"></div>
+    <div class="quote-sub">오늘도 애써주시는 선생님께 · 사하의집 드림</div>
+  </div>
+
+  <div class="stat-row" id="statRow"></div>
+
 
   <header class="hub-header">
     <div class="eyebrow" id="eyebrow">다하 사회복지법인</div>
@@ -156,8 +194,7 @@ const DATA = {
         apps: [
           { name: "투약일지", icon: "💊", url: "https://ankle0701-web.github.io/medicine/" },
           { name: "배변일지", icon: "📋", url: "https://ankle0701-web.github.io/mens-bowel/" },
-          { name: "신체측정", icon: "📏", url: "https://ankle0701-web.github.io/body-measurement-male/" },
-          { name: "수분섭취", icon: "💧", url: "https://ankle0701-web.github.io/water-intake/" }
+          { name: "신체측정", icon: "📏", url: "https://ankle0701-web.github.io/body-measurement-male/" }
         ]
       },
       "물봉선": {
@@ -167,8 +204,7 @@ const DATA = {
           { name: "투약일지", icon: "💊", url: "https://ankle0701-web.github.io/medicine/" },
           { name: "배변일지", icon: "📋", url: "https://ankle0701-web.github.io/checklist/" },
           { name: "생리일지", icon: "🩸", url: "https://ankle0701-web.github.io/menstruation/" },
-          { name: "신체측정", icon: "📏", url: "https://ankle0701-web.github.io/body-measurement-female/" },
-          { name: "수분섭취", icon: "💧", url: "https://ankle0701-web.github.io/water-intake/" }
+          { name: "신체측정", icon: "📏", url: "https://ankle0701-web.github.io/body-measurement-female/" }
         ]
       }
     }
@@ -177,9 +213,52 @@ const DATA = {
 
 let path = []; // e.g. ["사하의집"] or ["사하의집","기린초"]
 
+/* 시설 직원을 위한 응원 문구 - 날짜 기준으로 매일 하나씩 순환 */
+const QUOTES = [
+  "오늘 선생님의 작은 손길이, 누군가에게는 하루의 안심이 됩니다.",
+  "기록 하나하나가 결국 한 사람의 건강을 지키는 일입니다. 애쓰고 계세요.",
+  "완벽하지 않아도 괜찮아요. 마음을 다한 오늘이면 충분합니다.",
+  "선생님이 있어 오늘도 사하의집이 따뜻합니다. 고맙습니다.",
+  "잠깐 숨 고르셔도 돼요. 무리하지 않는 것도 좋은 돌봄의 시작입니다.",
+  "작은 변화를 알아채는 눈, 그게 선생님의 가장 큰 힘입니다.",
+  "오늘 하루도 애쓰신 선생님, 정말 수고 많으셨습니다."
+];
+function renderQuote(){
+  const dayIndex = Math.floor(Date.now() / 86400000) % QUOTES.length;
+  document.getElementById('quoteText').textContent = QUOTES[dayIndex];
+}
+
+function renderStats(){
+  const facility = DATA['사하의집'];
+  const unitCount = Object.keys(facility.units).length;
+  let appCount = 0;
+  Object.values(facility.units).forEach(u => appCount += u.apps.length);
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
+
+  const items = [
+    { icon: '📅', label: '오늘', value: dateStr },
+    { icon: '🏡', label: '관리 유닛', value: `${unitCount}개 (기린초·물봉선)` },
+    { icon: '🧩', label: '연결된 업무 앱', value: `${appCount}개` }
+  ];
+  document.getElementById('statRow').innerHTML = items.map(it => `
+    <div class="stat-item">
+      <div class="stat-icon">${it.icon}</div>
+      <div>
+        <div class="stat-label">${it.label}</div>
+        <div class="stat-value">${it.value}</div>
+      </div>
+    </div>`).join('');
+}
+
+
 function render(){
   renderCrumbs();
-  document.getElementById('heroCard').style.display = (path.length === 0) ? 'block' : 'none';
+  const isHome = (path.length === 0);
+  document.getElementById('heroCard').style.display = isHome ? 'block' : 'none';
+  document.getElementById('quoteCard').style.display = isHome ? 'block' : 'none';
+  document.getElementById('statRow').style.display = isHome ? 'grid' : 'none';
+  if(isHome){ renderQuote(); renderStats(); }
   const content = document.getElementById('content');
 
   if(path.length === 0){
